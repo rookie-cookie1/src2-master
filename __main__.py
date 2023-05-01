@@ -4,19 +4,21 @@ from PIL import Image
 import os
 from natsort import natsorted, ns
 pygame.init()
-WIDTH = 1280
-HEIGHT = 720
-attack = False
-jump = False
-land = False
-frameList = [0, 0, 0, 4, -4]
+WIDTH = 1280 #Screen height
+HEIGHT = 720 #Scren width
+attack = False #Tells whether loogey is attacking
+jump = False #Tells whether loogey is jumping
+land = False #Tells wether loogey is landed
+frameList = [0, 0, 0, 4, -4] #Stores the frame numbers for loogeys animations
 finishedList = [True, True, True]
-momentumDivisor = 4
+momentumDivisor = 4 #Helps withthe  jump animation
 facing = False #This boolean dictates wich direction loogey is facing
-gravity = 1
-inAir = True
+gravity = 1 #Sets loogey's fall speed
+inAir = True #Determines alot of things such as loogey's jump conditions and animations
+
 class playerObject: #Creates the player controllable object
     def __init__(self, image, height, speed):
+        #These next 10 lines make the player components globally modifiable and set the position, collision size, image, jumping power, and speed of the player
         global loogeyMeleeAttackList
         global loogeyWalkingList
         global loogeyJumpingList
@@ -27,6 +29,7 @@ class playerObject: #Creates the player controllable object
         self.momentum = 0
         self.collideRect = pygame.Rect(self.pos.left, self.pos.bottom, 1, self.momentum)
         jumpPower = -24
+        #These lists contain loogeys animaiton frames
         loogeyMeleeAttackList = []
         loogeyWalkingList = []
         loogeyJumpingList = []
@@ -62,6 +65,7 @@ class playerObject: #Creates the player controllable object
             #Does the walk animation if loogey is not attacking
             if attack == False and jump == False:
                 self.walk()
+        #This if statement is a relic from an earlier version, not very important
         if down:
             self.pos.top += self.speed
         if up:
@@ -78,6 +82,7 @@ class playerObject: #Creates the player controllable object
         if self.pos.top < 0:
             self.pos.top = HEIGHT-SPRITE_HEIGHT
     def attack(self):
+        #This function plays the attack animation
         global tick
         global finishedList
         global attack
@@ -99,6 +104,7 @@ class playerObject: #Creates the player controllable object
             attack = False
             finishedList[0] = True
     def jump(self):
+        #This function plays the jump animation and applies the physics
         global tick 
         global inAir
         global frameList
@@ -137,6 +143,7 @@ class playerObject: #Creates the player controllable object
                     self.image = loogeyJumpingList[4]
                 
     def land(self):
+        #This function plays the landing animation
         global frameList
         global finishedList
         global land
@@ -162,6 +169,7 @@ class playerObject: #Creates the player controllable object
 
 
     def walk(self):
+        #This function plays the walking animation
         global tick
         global frameList
         frame = frameList[2]
@@ -176,6 +184,7 @@ class playerObject: #Creates the player controllable object
             if frameList[2] >= len(loogeyWalkingList):
                 frameList[2] = 0
     def update(self):
+        #This function applies physics to the character and manages animations
         global land
         global inAir
         global jump
@@ -231,18 +240,19 @@ screen.blit(background, (0, 0)) #Creates the background
 objects = []            #Object list
 props = []              #The props list
 player = playerObject(playerImgPG, 0, 5) #Creates the player object
-floor = gameObjectStatic((3, 3, 3), WIDTH, 60, 0, 660)
+floor = gameObjectStatic((3, 3, 3), WIDTH, 60, 0, 660) #creates the floor object
 props.append(floor)
 tick = 0
-while True: #Main game loop
-    #This if block slows the attack animation down to 20fps and activates 
+while True: #Main game loop 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
+    #These lines print the background image and player
     screen.blit(background, player.pos, player.pos)
     player.update()
     screen.blit(player.image, player.pos)
     keys = pygame.key.get_pressed()
+    #These are the inputs fot the programs
     if keys[pygame.K_UP]:
         player.move(up=True)
     if keys[pygame.K_DOWN]:
@@ -253,9 +263,11 @@ while True: #Main game loop
         player.move(right=True)
     if keys[pygame.K_SPACE]:
         player.move(space=True)
+    #The next line prints the floor
     floor.draw()
     pygame.display.update()
     clock.tick(60)
+    #Tick shows what frame the game is on. Useful for making 20fps animations
     tick = tick + 1
     if tick >= 60:
         tick = 0
